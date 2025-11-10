@@ -8,22 +8,23 @@ class Producto:
     def __str__(self):
         return f"{self.nombre} - Precio: {self.precio:.2f} - Cantidad: {self.cantidad}"
 
-class Postre(Producto):
+class Salchicha(Producto):
     def __init__(self, id, nombre, precio, cantidad, es_vegano):
         super().__init__(id, nombre, precio, cantidad)
         self.es_vegano = es_vegano
 
-class Cafe(Producto):
-    def __init__(self, id, nombre, precio, cantidad, tamaño, es_descafeinado):
+class Pan(Producto):
+    def __init__(self, id, nombre, precio, cantidad, tamaño, es_integral):
         super().__init__(id, nombre, precio, cantidad)
         self.tamaño = tamaño
-        self.es_descafeinado = es_descafeinado
+        self.es_integral = es_integral
 
-class Jugo(Producto):
+class Refresco(Producto):
     def __init__(self, id, nombre, precio, cantidad, sabor, contiene_azucar):
         super().__init__(id, nombre, precio, cantidad)
         self.sabor = sabor
         self.contiene_azucar = contiene_azucar
 
     def es_saludable(self):
+
         return not self.contiene_azucar
