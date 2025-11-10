@@ -14,10 +14,10 @@ class Factura:
 
         if "a" in self.cliente.nombre.lower():
             for producto, cantidad in self.productos_seleccionados:
-                if isinstance(producto, Postre) and producto.es_vegano:
+                if isinstance(producto, Salchicha) and producto.es_vegano:
                     total_descuento += 0.05 * cantidad * producto.precio
 
-                if isinstance(producto, Jugo) and producto.es_saludable():
+                if isinstance(producto, Refresco) and producto.es_saludable():
                     total_descuento += 0.05 * cantidad * producto.precio
 
         return total_descuento
@@ -42,3 +42,4 @@ class Factura:
         print(f"Subtotal: {total_sin_descuento:.2f}")
         print(f"Descuento: {descuento:.2f}")
         print(f"Total a pagar: {total_pagar:.2f}")
+
