@@ -2,20 +2,20 @@ import funciones as f
 
 
 menu = {
-    "postres": [
-        {"nombre": "Torta de chocolate", "precio": 5.00, "cantidad": 10, "es_vegano": False},
-        {"nombre": "Torta de frutas", "precio": 4.50, "cantidad": 12, "es_vegano": True},
-        {"nombre": "Torta de helado", "precio": 6.00, "cantidad": 8, "es_vegano": False}
+    "Salchichas": [
+        {"nombre": "Salchicha normal", "precio": 5.00, "cantidad": 10, "es_vegano": False},
+        {"nombre": "Salchicha vegana", "precio": 4.50, "cantidad": 12, "es_vegano": True},
+        {"nombre": "Salchicha alemana", "precio": 6.00, "cantidad": 12, "es_vegano": False}
     ],
-    "cafes": [
-        {"nombre": "Espresso", "precio": 2.00, "cantidad": 15, "tamaño": "pequeño", "es_descafeinado": False},
-        {"nombre": "Capuccino", "precio": 3.00, "cantidad": 12, "tamaño": "mediano", "es_descafeinado": False},
-        {"nombre": "Moka", "precio": 4.00, "cantidad": 10, "tamaño": "grande", "es_descafeinado": False}
+    "Pan": [
+        {"nombre": "Normal", "precio": 2.00, "cantidad": 15, "tamaño": "mediano", "es_integral": False},
+        {"nombre": "Grande", "precio": 3.00, "cantidad": 12, "tamaño": "grande", "es_integral": False},
+        {"nombre": "Integral", "precio": 4.00, "cantidad": 10, "tamaño": "mediano", "es_integral": True}
     ],
-    "jugos": [
-        {"nombre": "Jugo de naranja", "precio": 3.00, "cantidad": 20, "sabor": "naranja", "contiene_azucar": True},
-        {"nombre": "Jugo de manzana", "precio": 2.50, "cantidad": 18, "sabor": "manzana", "contiene_azucar": False},
-        {"nombre": "Jugo de plátano", "precio": 2.00, "cantidad": 15, "sabor": "cambur", "contiene_azucar": False}
+    "Refrescos": [
+        {"nombre": "Pepsi", "precio": 3.00, "cantidad": 20, "sabor": "Cola", "contiene_azucar": True},
+        {"nombre": "Pepsi zero", "precio": 3.50, "cantidad": 18, "sabor": "Cola", "contiene_azucar": False},
+        {"nombre": "Frescolita", "precio": 3.20, "cantidad": 15, "sabor": "naranja", "contiene_azucar": True}
     ]
 }
 
@@ -54,3 +54,4 @@ clientes = []
 # Ejecución del menú principal
 
 main()
+
