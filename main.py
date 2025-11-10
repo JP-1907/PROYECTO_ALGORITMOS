@@ -23,7 +23,7 @@ menu = {
 def main():
 
     print("***********************************************************************")
-    print("Te damos la bienvenida al sistema de gestión de la Cafetería CoffeeLove")
+    print("Te damos la bienvenida al sistema de gestión de Hot Dog CCS")
     print("***********************************************************************\n")
 
     while True:
@@ -52,4 +52,5 @@ productos = f.transformar_menu(menu)
 clientes = []
 
 # Ejecución del menú principal
+
 main()
