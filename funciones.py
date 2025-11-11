@@ -1,41 +1,54 @@
-from producto import Cafe, Jugo, Postre
+from producto import Pan, Refresco, PerroProducto
 from cliente import Cliente
 from factura import Factura
 
-def transformar_menu(menu):
+def transformar_menu(menu_json):
     productos = []
+    id_actual = 1
 
-    for categoria in menu:
-        for producto_data in menu[categoria]:
-            if categoria == "postres":
-                producto = Postre(
-                    nombre=producto_data["nombre"],
-                    precio=producto_data["precio"],
-                    cantidad=producto_data["cantidad"],
-                    es_vegano=producto_data["es_vegano"],
-                    id= len(productos) + 1
+    for categoria_data in menu_json:
+        categoria = categoria_data.get("Categoria", "")
+        opciones = categoria_data.get("Opciones", [])
+
+        for item in opciones:
+            nombre = item.get("nombre", "Sin nombre")
+            precio = 3.0  # Valor por defecto
+            cantidad = 10  # Valor por defecto
+
+            if categoria == "Pan":
+                producto = Pan(
+                    id=id_actual,
+                    nombre=nombre,
+                    precio=precio,
+                    cantidad=cantidad,
+                    tamaño=item.get("tamaño", 6),
+                    es_integral=item.get("tipo", "").lower() == "trigo entero"
                 )
-            elif categoria == "cafes":
-                producto = Cafe(
-                    nombre=producto_data["nombre"],
-                    precio=producto_data["precio"],
-                    cantidad=producto_data["cantidad"],
-                    tamaño=producto_data["tamaño"],
-                    es_descafeinado=producto_data["es_descafeinado"],
-                    id= len(productos) + 1
+
+            elif categoria == "Salchicha":
+                producto = PerroProducto(
+                    id=id_actual,
+                    nombre=nombre,
+                    precio=precio,
+                    cantidad=cantidad,
+                    es_vegano=item.get("tipo", "").lower() == "vegetal"
                 )
+
+            elif categoria == "Acompañante" and item.get("tipo", "").lower() == "refresco":
+                producto = Refresco(
+                    id=id_actual,
+                    nombre=nombre,
+                    precio=precio,
+                    cantidad=cantidad,
+                    sabor=nombre,
+                    contiene_azucar="zero" not in nombre.lower()
+                )
+
             else:
-                producto = Jugo(
-                    nombre=producto_data["nombre"],
-                    precio=producto_data["precio"],
-                    cantidad=producto_data["cantidad"],
-                    sabor=producto_data["sabor"],
-                    contiene_azucar=producto_data["contiene_azucar"],
-                    id= len(productos) + 1
-                )
-            
-            #Por qué no funciona poner el id aquí? producto.id = x. ¿Cómo hacemos que se pueda?
+                continue  # Ignorar salsas, toppings, jugos, papas, etc.
+
             productos.append(producto)
+            id_actual += 1
 
     return productos
 
@@ -50,7 +63,7 @@ def registrar_cliente(clientes):
 
 def mostrar_menu(productos):
     for producto in productos:
-        print(f"{producto.id}. {producto.__str__()}")
+        print(f"{producto.id}. {producto}")
 
 def buscar_cliente_por_cedula(cedula, clientes):
     for cliente in clientes:
@@ -65,7 +78,6 @@ def buscar_producto_por_id(id_producto, productos):
     return None
 
 def realizar_compra(clientes, productos):
- 
     while True:
         cedula = input("Ingrese la cédula del cliente: ")
         cliente = buscar_cliente_por_cedula(cedula, clientes)
@@ -75,40 +87,48 @@ def realizar_compra(clientes, productos):
 
             productos_seleccionados = []
             while True:
-                id_producto = int(input("Ingrese el ID del producto a agregar (o 0 para finalizar): "))
+                try:
+                    id_producto = int(input("Ingrese el ID del producto a agregar (o 0 para finalizar): "))
+                except ValueError:
+                    print("ID inválido. Intente nuevamente.")
+                    continue
 
                 if id_producto == 0:
                     break
-                
+
                 producto = buscar_producto_por_id(id_producto, productos)
 
                 if producto:
-                    cantidad = int(input(f"Ingrese la cantidad de {producto.nombre}: "))
+                    try:
+                        cantidad = int(input(f"Ingrese la cantidad de {producto.nombre}: "))
+                    except ValueError:
+                        print("Cantidad inválida.")
+                        continue
 
-                    if producto.cantidad >= cantidad: #Esta es una de las validaciones. Deberían validar tambien que el cliente no ponga nro negativo o 0
-                        productos_seleccionados.append((producto, cantidad)) #Tuplas
+                    if cantidad <= 0:
+                        print("La cantidad debe ser mayor que cero.")
+                    elif producto.cantidad >= cantidad:
+                        productos_seleccionados.append((producto, cantidad))
                     else:
                         print("No hay suficiente cantidad del producto seleccionado.")
                 else:
                     print(f"Producto con ID {id_producto} no encontrado.")
 
+            if productos_seleccionados:
+                factura = Factura(cliente, productos_seleccionados)
+                factura.mostrar_factura()
 
-            # Crear factura
-            factura = Factura(cliente, productos_seleccionados)
+                confirmar_pago = input("¿Desea confirmar la compra? (S/N): ")
 
-            # Mostrar factura
-            factura.mostrar_factura()
-
-            confirmar_pago = input("¿Desea confirmar la compra? (S/N): ")
-
-            if confirmar_pago.upper() == "S":
-                for producto, cantidad in productos_seleccionados:
-                    producto.cantidad -= cantidad  # Resta la cantidad solo si se confirma la compra
-
-                print("Compra realizada con éxito!")
-                break
+                if confirmar_pago.upper() == "S":
+                    for producto, cantidad in productos_seleccionados:
+                        producto.cantidad -= cantidad
+                    print("Compra realizada con éxito!")
+                else:
+                    print("Compra cancelada. No se modificó el inventario.")
             else:
-                print("Compra cancelada.") #Aún así se resta del inventario. Corregir
+                print("No se seleccionaron productos.")
+            break
         else:
             print(f"Cliente con cédula {cedula} no registrado. ¿Desea registrarlo? (S/N): ")
             registrar_nuevo_cliente = input().upper()
@@ -117,4 +137,3 @@ def realizar_compra(clientes, productos):
                 registrar_cliente(clientes)
             else:
                 print("\nRegresando al menú principal...\n")
-                break
