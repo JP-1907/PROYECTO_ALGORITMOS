@@ -14,11 +14,7 @@ productos = f.transformar_menu(menu_json)
 clientes = []
 def main():
     # Crear productos iniciales
-    productos = [
-        Pan(1, "Pan de perro", 50),
-        Refresco(2, "Coca-Cola", 30),
-        PerroProducto(3, "Salchicha", 100)
-    ]
+
 
     inventario = Inventario(productos)
 
@@ -64,6 +60,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
