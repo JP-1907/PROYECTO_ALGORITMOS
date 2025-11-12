@@ -132,4 +132,54 @@ def realizar_compra(clientes, productos):
                 registrar_cliente(clientes)
             else:
                 print("\nRegresando al menú principal...\n")
+def menu_inventario(inventario: Inventario):
+    """Maneja las opciones del menú de gestión de inventario."""
+    while True:
+        print("\n==== 📈 Gestión de Inventario ====")
+        print("1. Visualizar todo el inventario")
+        print("2. Buscar existencia de un ingrediente por nombre")
+        print("3. Listar por Categoría (Pan, Refresco, Salchicha)")
+        print("4. Actualizar existencia de un producto por ID")
+        print("5. Volver al Menú Principal")
+
+        opcion_inv = input("Ingrese la opción deseada: ")
+
+        if opcion_inv == "1":
+            inventario.visualizar_inventario()
+        
+        elif opcion_inv == "2":
+            nombre = input("Ingrese el nombre del producto a buscar: ")
+            inventario.buscar_existencia_por_nombre(nombre)
+            
+        elif opcion_inv == "3":
+            print("\nCategorías disponibles:")
+            print("a. Pan")
+            print("b. Refresco")
+            print("c. Salchicha (PerroProducto)")
+            
+            opcion_cat = input("Seleccione una categoría (a/b/c): ").lower()
+            
+            if opcion_cat == 'a':
+                inventario.listar_por_categoria(Pan)
+            elif opcion_cat == 'b':
+                inventario.listar_por_categoria(Refresco)
+            elif opcion_cat == 'c':
+                # Asumo que PerroProducto es la salchicha/hot dog ingrediente
+                inventario.listar_por_categoria(PerroProducto) 
+            else:
+                print("Opción de categoría no válida.")
+
+        elif opcion_inv == "4":
+            try:
+                id_producto = int(input("Ingrese el ID del producto a actualizar: "))
+                nueva_cantidad = int(input("Ingrese la nueva cantidad total en stock: "))
+                inventario.actualizar_existencia(id_producto, nueva_cantidad)
+            except ValueError:
+                print("Entrada inválida. Asegúrese de ingresar números para ID y cantidad.")
+
+        elif opcion_inv == "5":
+            break
+            
+        else:
+            print("Opción no válida. Intente nuevamente.")
 
