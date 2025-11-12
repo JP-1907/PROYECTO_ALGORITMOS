@@ -20,7 +20,7 @@ class PerroProducto(Producto):
     def __init__(self, id, nombre, precio, cantidad):
         super().__init__(id, nombre, precio, cantidad)
     def __str__(self):
-        return f"{super().__str__()} - Tipo: {tipo}"
+        return f"{super().__str__()}"
 class Pan(Producto):
     def __init__(self, id, nombre, precio, cantidad, tamaño):
         super().__init__(id, nombre, precio, cantidad)
@@ -30,8 +30,7 @@ class Refresco(Producto):
     def __init__(self, id, nombre, precio, cantidad):
         super().__init__(id, nombre, precio, cantidad)
 
-    def es_saludable(self):
 
-        return not self.contiene_azucar
+
 
 
