@@ -25,10 +25,9 @@ class PerroProducto(Producto):
         tipo = "Vegano" if self.es_vegano else "No vegano"
         return f"{super().__str__()} - Tipo: {tipo}"
 class Pan(Producto):
-    def __init__(self, id, nombre, precio, cantidad, tamaño, es_integral):
+    def __init__(self, id, nombre, precio, cantidad, tamaño):
         super().__init__(id, nombre, precio, cantidad)
         self.tamaño = tamaño
-        self.es_integral = es_integral
 
 class Refresco(Producto):
     def __init__(self, id, nombre, precio, cantidad, sabor, contiene_azucar):
@@ -39,3 +38,4 @@ class Refresco(Producto):
     def es_saludable(self):
 
         return not self.contiene_azucar
+
