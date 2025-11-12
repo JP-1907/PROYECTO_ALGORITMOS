@@ -1,3 +1,17 @@
+import funciones as f
+import json
+
+# Cargar el menú desde ingredientes.json
+try:
+    with open("ingredientes.json", "r", encoding="utf-8") as file:
+        menu_json = json.load(file)
+except FileNotFoundError:
+    print("Error: No se encontró el archivo ingredientes.json.")
+    menu_json = []
+
+# Transformar el menú en objetos de producto
+productos = f.transformar_menu(menu_json)
+clientes = []
 def main():
     print("***********************************************************************")
     print("Te damos la bienvenida al sistema de gestión de Hot Dog CCS")
@@ -32,5 +46,6 @@ def main():
             break
         else:
             print("Opción no válida. Intente nuevamente.")
+
 
 
