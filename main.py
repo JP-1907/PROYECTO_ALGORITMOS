@@ -1,6 +1,17 @@
 import Manejo_Inventario
 from producto import Pan, Refresco, PerroProducto
-
+import funciones as f
+import json
+# Cargar el menú desde ingredientes.json
+try:
+    with open("ingredientes.json", "r", encoding="utf-8") as file:
+        menu_json = json.load(file)
+except FileNotFoundError:
+    print("Error: No se encontró el archivo ingredientes.json.")
+    menu_json = []
+# Transformar el menú en objetos de producto
+productos = f.transformar_menu(menu_json)
+clientes = []
 def main():
     # Crear productos iniciales
     productos = [
@@ -53,6 +64,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
