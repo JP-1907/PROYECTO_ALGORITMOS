@@ -1,5 +1,7 @@
 # inventario.py
 
+# inventario.py
+
 from producto import Producto, Pan, Refresco, PerroProducto
 from typing import List, Optional
 
