@@ -1,17 +1,3 @@
-import funciones as f
-import json
-
-# Cargar el menú desde ingredientes.json
-try:
-    with open("ingredientes.json", "r", encoding="utf-8") as file:
-        menu_json = json.load(file)
-except FileNotFoundError:
-    print("Error: No se encontró el archivo ingredientes.json.")
-    menu_json = []
-
-# Transformar el menú en objetos de producto
-productos = f.transformar_menu(menu_json)
-clientes = []
 def main():
     print("***********************************************************************")
     print("Te damos la bienvenida al sistema de gestión de Hot Dog CCS")
@@ -22,8 +8,8 @@ def main():
         print("1. Registrar cliente")
         print("2. Mostrar menú (Productos disponibles para la venta)")
         print("3. Realizar compra")
-        print("4. Gestión de Inventario") 
-        print("5. Salir") 
+        print("4. Gestión de Inventario") # Nueva Opción
+        print("5. Salir") # Opción Salir ahora es 5
 
         opcion = input("Ingrese la opción deseada: ")
 
@@ -36,16 +22,18 @@ def main():
                 print("No hay productos disponibles.")
         elif opcion == "3":
             if productos:
+                # La función realizar_compra ya actualiza la cantidad en el objeto producto,
+                # lo cual se refleja automáticamente en el Inventario.
                 f.realizar_compra(clientes, productos) 
             else:
                 print("No se puede realizar la compra: menú vacío.")
         elif opcion == "4":
+            # Manejar el submenú de inventario
             menu_inventario(inventario)
-        elif opcion == "5":
+        elif opcion == "5": # Nueva opción de salir
             print("Saliendo del sistema...")
             break
         else:
             print("Opción no válida. Intente nuevamente.")
-
 
 
