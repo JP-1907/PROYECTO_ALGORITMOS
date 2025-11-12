@@ -1,7 +1,7 @@
 from producto import Pan, Refresco, PerroProducto
 from cliente import Cliente
 from factura import Factura
-
+import M_Inventario
 def transformar_menu(menu_json):
     productos = []
     id_actual = 1
@@ -22,22 +22,21 @@ def transformar_menu(menu_json):
                     precio=precio,
                     cantidad=cantidad,
                     tamaño=item.get("tamaño", 6)
-
+                )
             elif categoria == "Salchicha":
                 producto = PerroProducto(
                     id=id_actual,
                     nombre=nombre,
                     precio=precio,
                     cantidad=cantidad
-
+                )
             elif categoria == "Acompañante" and item.get("tipo", "").lower() == "refresco":
                 producto = Refresco(
                     id=id_actual,
                     nombre=nombre,
                     precio=precio,
                     cantidad=cantidad,
-                    sabor=nombre,
-
+                )
 
             else:
                 continue  # Ignorar salsas, toppings, jugos, papas, etc.
@@ -132,54 +131,46 @@ def realizar_compra(clientes, productos):
                 registrar_cliente(clientes)
             else:
                 print("\nRegresando al menú principal...\n")
+from M_Inventario import Inventario, Pan, Refresco, PerroProducto
+
 def menu_inventario(inventario: Inventario):
-    """Maneja las opciones del menú de gestión de inventario."""
     while True:
-        print("\n==== 📈 Gestión de Inventario ====")
-        print("1. Visualizar todo el inventario")
-        print("2. Buscar existencia de un ingrediente por nombre")
-        print("3. Listar por Categoría (Pan, Refresco, Salchicha)")
-        print("4. Actualizar existencia de un producto por ID")
-        print("5. Volver al Menú Principal")
+        print("\n==== Gestión de Inventario ====")
+        print("1. Visualizar inventario")
+        print("2. Buscar por nombre")
+        print("3. Listar por categoría")
+        print("4. Actualizar existencia")
+        print("5. Volver al menú principal")
 
-        opcion_inv = input("Ingrese la opción deseada: ")
+        opcion = input("Seleccione una opción: ")
 
-        if opcion_inv == "1":
+        if opcion == "1":
             inventario.visualizar_inventario()
-        
-        elif opcion_inv == "2":
-            nombre = input("Ingrese el nombre del producto a buscar: ")
+        elif opcion == "2":
+            nombre = input("Nombre del producto: ")
             inventario.buscar_existencia_por_nombre(nombre)
-            
-        elif opcion_inv == "3":
-            print("\nCategorías disponibles:")
-            print("a. Pan")
-            print("b. Refresco")
-            print("c. Salchicha (PerroProducto)")
-            
-            opcion_cat = input("Seleccione una categoría (a/b/c): ").lower()
-            
-            if opcion_cat == 'a':
+        elif opcion == "3":
+            print("Categorías disponibles: Pan, Refresco, PerroProducto")
+            categoria = input("Ingrese la categoría: ").lower()
+            if categoria == "pan":
                 inventario.listar_por_categoria(Pan)
-            elif opcion_cat == 'b':
+            elif categoria == "refresco":
                 inventario.listar_por_categoria(Refresco)
-            elif opcion_cat == 'c':
-                # Asumo que PerroProducto es la salchicha/hot dog ingrediente
-                inventario.listar_por_categoria(PerroProducto) 
+            elif categoria == "perroproducto":
+                inventario.listar_por_categoria(PerroProducto)
             else:
-                print("Opción de categoría no válida.")
-
-        elif opcion_inv == "4":
+                print("Categoría no reconocida.")
+        elif opcion == "4":
             try:
-                id_producto = int(input("Ingrese el ID del producto a actualizar: "))
-                nueva_cantidad = int(input("Ingrese la nueva cantidad total en stock: "))
+                id_producto = int(input("ID del producto: "))
+                nueva_cantidad = int(input("Nueva cantidad: "))
                 inventario.actualizar_existencia(id_producto, nueva_cantidad)
             except ValueError:
-                print("Entrada inválida. Asegúrese de ingresar números para ID y cantidad.")
-
-        elif opcion_inv == "5":
+                print("Entrada inválida.")
+        elif opcion == "5":
             break
-            
         else:
-            print("Opción no válida. Intente nuevamente.")
+            print("Opción no válida.")
+
+
 
