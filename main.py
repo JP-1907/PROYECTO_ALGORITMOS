@@ -1,65 +1,55 @@
-import Manejo_Inventario
-from producto import Pan, Refresco, PerroProducto
 import funciones as f
 import json
-# Cargar el menú desde ingredientes.json
+import M_Inventario
+
 try:
     with open("ingredientes.json", "r", encoding="utf-8") as file:
         menu_json = json.load(file)
 except FileNotFoundError:
     print("Error: No se encontró el archivo ingredientes.json.")
     menu_json = []
-# Transformar el menú en objetos de producto
+
+
 productos = f.transformar_menu(menu_json)
 clientes = []
-def main():
-    # Crear productos iniciales
+inventario = M_Inventario.Inventario(productos)
 
 
-    inventario = Inventario(productos)
+try:
+    with open("ingredientes.json", "r", encoding="utf-8") as file:
+        menu_json = json.load(file)
+except FileNotFoundError:
+    print("Error: No se encontró el archivo ingredientes.json.")
+    menu_json = []
+productos = f.transformar_menu(menu_json)
+inventario = M_Inventario.Inventario(productos)
+clientes = []
+print("***********************************************************************")
+print("Te damos la bienvenida al sistema de gestión de Hot Dog CCS")
+print("***********************************************************************\n")
 
-    while True:
-        print("\n==== Menú Principal ====")
-        print("1. Ver inventario")
-        print("2. Buscar producto por nombre")
-        print("3. Buscar producto por ID")
-        print("4. Listar por categoría")
-        print("5. Actualizar stock")
-        print("6. Salir")
+while True:
+    print("\n====Menú Principal====")
+    print("1. Registrar cliente")
+    print("2. Mostrar menú")
+    print("3. Realizar compra")
+    print("4. Gestión de Inventario") 
+    print("5. Salir")
+    opcion = input("Ingrese la opción deseada: ")
+    if opcion == "1":
+        f.registrar_cliente(clientes)
+    elif opcion == "2":
+        f.mostrar_menu(productos) if productos else print("No hay productos disponibles.")
+    elif opcion == "3":
+        f.realizar_compra(clientes, productos) if productos else print("No se puede realizar la compra: menú vacío.")
+    elif opcion == "4":
+        f.menu_inventario(inventario)  
+    elif opcion == "5": 
+        print("Saliendo del sistema...")
+        break
+    else:
+        print("Opción no válida. Intente nuevamente.")
 
-        opcion = input("Seleccione una opción: ")
-
-        if opcion == "1":
-            inventario.visualizar_inventario()
-        elif opcion == "2":
-            nombre = input("Ingrese el nombre del producto: ")
-            inventario.buscar_existencia_por_nombre(nombre)
-        elif opcion == "3":
-            id_producto = int(input("Ingrese el ID del producto: "))
-            inventario.buscar_existencia_por_id(id_producto)
-        elif opcion == "4":
-            print("Categorías: Pan, Refresco, PerroProducto")
-            categoria = input("Ingrese la categoría: ")
-            if categoria == "Pan":
-                inventario.listar_por_categoria(Pan)
-            elif categoria == "Refresco":
-                inventario.listar_por_categoria(Refresco)
-            elif categoria == "PerroProducto":
-                inventario.listar_por_categoria(PerroProducto)
-            else:
-                print("Categoría no válida.")
-        elif opcion == "5":
-            id_producto = int(input("Ingrese el ID del producto: "))
-            nueva_cantidad = int(input("Ingrese la nueva cantidad: "))
-            inventario.actualizar_existencia(id_producto, nueva_cantidad)
-        elif opcion == "6":
-            print("Saliendo del sistema...")
-            break
-        else:
-            print("Opción no válida.")
-
-if __name__ == "__main__":
-    main()
 
 
 
