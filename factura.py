@@ -44,3 +44,4 @@ class Factura:
         print(f"Total a pagar: {total_pagar:.2f}")
 
 
+
