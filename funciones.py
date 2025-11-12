@@ -21,18 +21,14 @@ def transformar_menu(menu_json):
                     nombre=nombre,
                     precio=precio,
                     cantidad=cantidad,
-                    tamaño=item.get("tamaño", 6),
-                    es_integral=item.get("tipo", "").lower() == "trigo entero"
-                )
+                    tamaño=item.get("tamaño", 6)
 
             elif categoria == "Salchicha":
                 producto = PerroProducto(
                     id=id_actual,
                     nombre=nombre,
                     precio=precio,
-                    cantidad=cantidad,
-                    es_vegano=item.get("tipo", "").lower() == "vegetal"
-                )
+                    cantidad=cantidad
 
             elif categoria == "Acompañante" and item.get("tipo", "").lower() == "refresco":
                 producto = Refresco(
@@ -41,8 +37,7 @@ def transformar_menu(menu_json):
                     precio=precio,
                     cantidad=cantidad,
                     sabor=nombre,
-                    contiene_azucar="zero" not in nombre.lower()
-                )
+
 
             else:
                 continue  # Ignorar salsas, toppings, jugos, papas, etc.
@@ -137,3 +132,4 @@ def realizar_compra(clientes, productos):
                 registrar_cliente(clientes)
             else:
                 print("\nRegresando al menú principal...\n")
+
