@@ -9,4 +9,5 @@ class Cliente:
 
 #Como ven tiene un solo método.
 #¿Qué podría añadirse al enunciado para que cliente tenga más métodos?
+
 #CRUD, Crear, Leer, Actualizar, Eliminar.
