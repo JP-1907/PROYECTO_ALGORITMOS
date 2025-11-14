@@ -1,21 +1,46 @@
-from producto import Pan, Refresco, PerroProducto
 from cliente import Cliente
 from factura import Factura
-import M_Inventario
+import json
+from producto import Pan, PerroProducto, Topping, Salsa, Acompañamiento
+import json
+
+def mostrar_menu_hotdogs():
+    try:
+        with open("menu.json", "r", encoding="utf-8") as file:
+            menu = json.load(file)
+    except FileNotFoundError:
+        print("No se encontró el archivo menu.json.")
+        return
+
+    print("\n=== Menú de Hot Dogs ===")
+    for i, item in enumerate(menu, start=1):
+        nombre = item.get("nombre", "Sin nombre")
+        pan = item.get("Pan", "N/A")
+        salchicha = item.get("Salchicha", "N/A")
+        toppings = ", ".join(item.get("toppings", [])) or "Sin toppings"
+        salsas = ", ".join(item.get("salsas", item.get("Salsas", []))) or "Sin salsas"
+        acompañante = item.get("Acompañante", "Sin acompañante")
+
+        print(f"\n{i}. {nombre.upper()}")
+        print(f"    Pan: {pan}")
+        print(f"    Salchicha: {salchicha}")
+        print(f"    Toppings: {toppings}")
+        print(f"    Salsas: {salsas}")
+        print(f"    Acompañante: {acompañante}")
 def transformar_menu(menu_json):
     productos = []
     id_actual = 1
 
     for categoria_data in menu_json:
-        categoria = categoria_data.get("Categoria", "")
+        categoria = categoria_data.get("Categoria", "").lower()
         opciones = categoria_data.get("Opciones", [])
 
         for item in opciones:
             nombre = item.get("nombre", "Sin nombre")
-            precio = 3.0  # Valor por defecto
-            cantidad = 10  # Valor por defecto
+            precio = item.get("precio", 3.0)
+            cantidad = item.get("cantidad", 40)
 
-            if categoria == "Pan":
+            if categoria == "pan":
                 producto = Pan(
                     id=id_actual,
                     nombre=nombre,
@@ -23,23 +48,49 @@ def transformar_menu(menu_json):
                     cantidad=cantidad,
                     tamaño=item.get("tamaño", 6)
                 )
-            elif categoria == "Salchicha":
+
+            elif categoria == "salchicha":
                 producto = PerroProducto(
                     id=id_actual,
                     nombre=nombre,
                     precio=precio,
-                    cantidad=cantidad
+                    cantidad=cantidad,
+                    tipo_salchicha=item.get("tipo", "vienesa")
                 )
-            elif categoria == "Acompañante" and item.get("tipo", "").lower() == "refresco":
-                producto = Refresco(
+
+            elif categoria in ["topping", "toppings"]:
+                producto = Topping(
                     id=id_actual,
                     nombre=nombre,
                     precio=precio,
                     cantidad=cantidad,
+                    es_picante=item.get("es_picante", False)
+                )
+
+            elif categoria in ["salsa", "salsas"]:
+                producto = Salsa(
+                    id=id_actual,
+                    nombre=nombre,
+                    precio=precio,
+                    cantidad=cantidad,
+                    tipo=item.get("tipo", "cremosa")
+                )
+
+            elif categoria in ["acompañante", "acompañantes"]:
+                if "no vendemos alcohol" in nombre.lower():
+                    continue  # Ignorar productos con esa frase
+
+                producto = Acompañamiento(
+                    id=id_actual,
+                    nombre=nombre,
+                    precio=precio,
+                    cantidad=cantidad,
+                    tipo=item.get("tipo", "acompañante"),
+                    detalles=item.get("detalles", [])
                 )
 
             else:
-                continue  # Ignorar salsas, toppings, jugos, papas, etc.
+                continue  # Ignorar categorías no reconocidas
 
             productos.append(producto)
             id_actual += 1
@@ -131,7 +182,7 @@ def realizar_compra(clientes, productos):
                 registrar_cliente(clientes)
             else:
                 print("\nRegresando al menú principal...\n")
-from M_Inventario import Inventario, Pan, Refresco, PerroProducto
+from M_Inventario import Inventario, Pan, Acompañamiento, PerroProducto, Salsa, Topping
 
 def menu_inventario(inventario: Inventario):
     while True:
@@ -146,20 +197,28 @@ def menu_inventario(inventario: Inventario):
 
         if opcion == "1":
             inventario.visualizar_inventario()
+
         elif opcion == "2":
             nombre = input("Nombre del producto: ")
             inventario.buscar_existencia_por_nombre(nombre)
+
         elif opcion == "3":
-            print("Categorías disponibles: Pan, Refresco, PerroProducto")
+            print("Categorías disponibles: pan, salchicha, topping, salsa, acompañante")
             categoria = input("Ingrese la categoría: ").lower()
+
             if categoria == "pan":
                 inventario.listar_por_categoria(Pan)
-            elif categoria == "refresco":
-                inventario.listar_por_categoria(Refresco)
-            elif categoria == "perroproducto":
+            elif categoria == "salchicha":
                 inventario.listar_por_categoria(PerroProducto)
+            elif categoria == "topping":
+                inventario.listar_por_categoria(Topping)
+            elif categoria == "salsa":
+                inventario.listar_por_categoria(Salsa)
+            elif categoria == "acompañante":
+                inventario.listar_por_categoria(Acompañamiento)
             else:
                 print("Categoría no reconocida.")
+
         elif opcion == "4":
             try:
                 id_producto = int(input("ID del producto: "))
@@ -167,10 +226,56 @@ def menu_inventario(inventario: Inventario):
                 inventario.actualizar_existencia(id_producto, nueva_cantidad)
             except ValueError:
                 print("Entrada inválida.")
+
         elif opcion == "5":
             break
         else:
             print("Opción no válida.")
+def guardar_clientes(clientes, archivo="clientes.json"):
+    with open(archivo, "w", encoding="utf-8") as f:
+        json.dump([vars(c) for c in clientes], f, ensure_ascii=False, indent=4)
 
+def cargar_clientes(archivo="clientes.json"):
+    try:
+        with open(archivo, "r", encoding="utf-8") as f:
+            return [Cliente(**data) for data in json.load(f)]
+    except FileNotFoundError:
+        return 
+    
+import random
+def mostrar_estadisticas():
+    print("Módulo de estadísticas aún no implementado. Simula al menos dos días para activarlo.")
+def simular_ventas(productos, inventario):
+    total_clientes = random.randint(0, 200)
+    cambio_opinion = 0
+    sin_compra = 0
+    ventas = {}
 
+    for i in range(total_clientes):
+        cantidad_hotdogs = random.randint(0, 5)
+        if cantidad_hotdogs == 0:
+            print(f"El cliente {i} cambió de opinión")
+            cambio_opinion += 1
+            continue
 
+        orden = []
+        for _ in range(cantidad_hotdogs):
+            hotdog = random.choice(productos)
+            if hotdog.cantidad > 0:
+                orden.append(hotdog)
+            else:
+                print(f"Cliente {i} no pudo comprar {hotdog.nombre} por falta de inventario")
+                sin_compra += 1
+                break
+
+        if orden:
+            for h in orden:
+                h.cantidad -= 1
+                ventas[h.nombre] = ventas.get(h.nombre, 0) + 1
+            print(f"Cliente {i} compró {[h.nombre for h in orden]}")
+
+    print("\n=== Resumen del día ===")
+    print(f"Total clientes: {total_clientes}")
+    print(f"Clientes sin compra: {sin_compra}")
+    print(f"Clientes que cambiaron de opinión: {cambio_opinion}")
+    print(f"Hot dogs vendidos: {ventas}")
