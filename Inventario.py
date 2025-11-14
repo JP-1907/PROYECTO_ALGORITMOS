@@ -59,3 +59,4 @@ class Inventario:
         else:
             print(f"\nNo se puede actualizar: Producto con ID {id_producto} no encontrado.")
 
+
