@@ -351,7 +351,7 @@ def cargar_clientes(archivo="clientes.json"):
 
 def mostrar_estadisticas():
     if len(estadisticas_dias) < 2:
-        print("⚠️ Debes simular al menos 2 días para ver estadísticas.")
+        print("Debes simular al menos 2 días para ver estadísticas.")
         return
 
     dias = [d["dia"] for d in estadisticas_dias]
@@ -433,7 +433,7 @@ def simular_ventas(productos, inventario, dia_numero=None):
         "ventas": ventas
     })
 
-    # 👉 Retornar resultados como diccionario
+ 
     return {
         "total_clientes": total_clientes,
         "sin_compra": sin_compra,
@@ -648,7 +648,7 @@ def eliminar_hotdog(inventario: Inventario):
             hay_inventario_suficiente = verificar_inventario_hotdog(hotdog_a_eliminar, inventario)
 
             if hay_inventario_suficiente:
-                print(f"\n⚠️ Advertencia: Aún hay inventario de los ingredientes para el Hot Dog '{nombre_hotdog}'.")
+                print(f"\nAdvertencia: Aún hay inventario de los ingredientes para el Hot Dog '{nombre_hotdog}'.")
                 confirmar = input("¿Realmente desea ELIMINAR este Hot Dog del menú? (S/N): ").upper()
                 if confirmar == 'S':
                     menu.pop(opcion - 1)
@@ -715,3 +715,4 @@ def menu_gestion_hotdogs(inventario: Inventario, hotdogs_json: list):
             break
         else:
             print("Opción no válida.")
+
