@@ -30,4 +30,4 @@ try:
     for perro in lista:
         print(perro)
 except Exception as e:
-    print("❌ Ocurrió un error:", e)
+    print(" Ocurrió un error:", e)

@@ -22,7 +22,7 @@ class PerroProducto(Producto):
         self.tipo_salchicha = tipo_salchicha
 
     def __str__(self):
-        return 
+        return f"{super().__str__()} - Tipo de salchicha: {self.tipo_salchicha}"
 
     def __str__(self):
         return f"{super().__str__()} - Tipo de salchicha: {self.tipo_salchicha}"

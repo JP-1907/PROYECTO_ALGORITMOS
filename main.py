@@ -1,58 +1,54 @@
 import funciones as f
-import M_Inventario
+from M_Inventario import Inventario
 
-# --- Inicialización ---
-menu_json = f.cargar_datos_remotos()      
-productos = f.transformar_menu(menu_json)    
-inventario = M_Inventario.Inventario(productos)
-clientes = []
+def main():
+    print("=== Bienvenido al Sistema de Gestión de Hot Dogs ===")
 
-print("Te damos la bienvenida al sistema de gestión de Hot Dog CCS")
+    # 1. Cargar inventario desde ingredientes.json
+    ingredientes_json = f.cargar_inventario_remoto()
+    productos = f.transformar_inventario(ingredientes_json)
+    inventario = Inventario(productos)
 
+    # 2. Cargar lista de hot dogs (recetas completas)
+    hotdogs_json = f.cargar_menu()
 
-while True:
-    print("\n====Menú Principal====")
-    print("1. Registrar cliente")
-    print("2. Mostrar menú de hot dogs (inventario remoto)")
-    print("3. Realizar compra de ingredientes")
-    print("4. Gestión de Inventario") 
-    print("5. Gestión del Menú de Hot Dogs") 
-    print("6. Simular un día de ventas")
-    print("7. Ver estadísticas")
-    print("8. Salir")
+    # 3. Menú principal
+    while True:
+        print("\n==== Menú Principal ====")
+        print("1. Gestión de clientes")
+        print("2. Gestión de inventario")
+        print("3. Gestión de hot dogs")
+        print("4. Simular ventas")
+        print("5. Mostrar estadisticas")
+        print("6. Salir")
+        opcion = input("Seleccione una opción: ")
 
-    opcion = input("Ingrese la opción deseada: ")
+        if opcion == "1":
+            clientes = f.cargar_clientes()
+            f.realizar_compra(clientes, productos)
+            f.guardar_clientes(clientes)
 
-    if opcion == "1":
-        f.registrar_cliente(clientes)
+        elif opcion == "2":
+            f.menu_inventario(inventario)
 
-    elif opcion == "2":
-        # Mostrar categorías y opciones desde el inventario remoto
-        for categoria in menu_json:
-            print(f"\n--- {categoria['Categoria'].upper()} ---")
-            for opcion in categoria.get("Opciones", []):
-                detalles = ", ".join(f"{k}: {v}" for k, v in opcion.items())
-                print(f"   - {detalles}")
+        elif opcion == "3":
+            f.menu_gestion_hotdogs(inventario, hotdogs_json)
 
-    elif opcion == "3":
-        f.realizar_compra(clientes, productos) if productos else print("No se puede realizar la compra: inventario vacío.")
+        elif opcion == "4":
+            resultado = f.simular_ventas(productos, inventario)
+            print("\n=== Resumen del día ===")
+            print(f"Total clientes: {resultado['total_clientes']}")
+            print(f"Clientes sin compra: {resultado['sin_compra']}")
+            print(f"Clientes que cambiaron de opinión: {resultado['cambio_opinion']}")
+            print(f"Productos vendidos: {resultado['ventas']}")
+        elif opcion == "5":
+            f.mostrar_estadisticas()
+        elif opcion == "6":
+            print("Gracias por usar el sistema. ¡Hasta pronto!")
+            break
 
-    elif opcion == "4":
-        f.menu_inventario(inventario)
+        else:
+            print("Opción no válida. Intente nuevamente.")
 
-    elif opcion == "5":
-        f.menu_gestion_hotdogs(inventario)
-
-    elif opcion == "6":
-        f.simular_ventas(productos, inventario)
-
-    elif opcion == "7":
-        f.mostrar_estadisticas()
-
-    elif opcion == "8":
-        print("Saliendo del sistema...")
-        break
-
-    else:
-        print("Opción no válida. Intente nuevamente.")
-
+if __name__ == "__main__":
+        main()
