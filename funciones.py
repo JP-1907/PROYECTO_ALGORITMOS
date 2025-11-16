@@ -1,19 +1,54 @@
+import requests
 from cliente import Cliente
 from factura import Factura
 import json
 from producto import Pan, PerroProducto, Topping, Salsa, Acompañamiento, Producto
 from M_Inventario import Inventario
 import random
-from typing import List, Optional  # <--- ¡CORRECCIÓN CLAVE AQUÍ! Se importa List y Optional
+from typing import List, Optional  
+import funciones as f
+URL_DATOS = "https://raw.githubusercontent.com/FernandoSapient/BPTSP05_2526-1/main/menu.json"
 
-# --- Funciones existentes (se mantienen) ---
+def cargar_datos_remotos():
+    """Carga inventario desde el link remoto en GitHub (lista de categorías)."""
+    try:
+        resp = requests.get(URL_DATOS, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()   # Aquí es una lista
+        return data          # devolvemos la lista completa
+    except Exception as e:
+        print(f"Error al cargar datos desde el link: {e}")
+        return []
 
+
+def mostrar_menu_hotdogs(hotdogs_json):
+    """Muestra el menú de hot dogs desde la lista remota."""
+    if not hotdogs_json:
+        print("El menú de hot dogs está vacío.")
+        return
+
+    print("\n=== Menú de Hot Dogs ===")
+    for i, item in enumerate(hotdogs_json, start=1):
+        nombre = item.get("nombre", "Sin nombre")
+        pan = item.get("Pan", "N/A")
+        salchicha = item.get("Salchicha", "N/A")
+        toppings = ", ".join(item.get("toppings", [])) or "Sin toppings"
+        salsas = ", ".join(item.get("salsas", [])) or "Sin salsas"
+        acompañante = item.get("Acompañante", "Sin acompañante")
+
+        print(f"\n{i}. {nombre.upper()}")
+        print(f"    Pan: {pan}")
+        print(f"    Salchicha: {salchicha}")
+        print(f"    Toppings: {toppings}")
+        print(f"    Salsas: {salsas}")
+        print(f"    Acompañante: {acompañante}")
 def mostrar_menu_hotdogs():
     try:
-        with open("menu.json", "r", encoding="utf-8") as file:
-            menu = json.load(file)
-    except FileNotFoundError:
-        print("No se encontró el archivo menu.json.")
+        response = requests.get(URL_DATOS)
+        response.raise_for_status() 
+        menu = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener el menú desde el link: {e}")
         return
 
     print("\n=== Menú de Hot Dogs ===")
@@ -32,78 +67,87 @@ def mostrar_menu_hotdogs():
         print(f"    Salsas: {salsas}")
         print(f"    Acompañante: {acompañante}")
 
+    print("\n=== Menú de Hot Dogs ===")
+    for i, item in enumerate(menu, start=1):
+        nombre = item.get("nombre", "Sin nombre")
+        pan = item.get("Pan", "N/A")
+        salchicha = item.get("Salchicha", "N/A")
+        toppings = ", ".join(item.get("toppings", [])) or "Sin toppings"
+        salsas = ", ".join(item.get("salsas", item.get("Salsas", []))) or "Sin salsas"
+        acompañante = item.get("Acompañante", "Sin acompañante")
+
+        print(f"\n{i}. {nombre.upper()}")
+        print(f"    Pan: {pan}")
+        print(f"    Salchicha: {salchicha}")
+        print(f"    Toppings: {toppings}")
+        print(f"    Salsas: {salsas}")
+        print(f"    Acompañante: {acompañante}")
 def transformar_menu(menu_json):
     productos = []
-    id_actual = 1
+    id_counter = 1
 
-    for categoria_data in menu_json:
-        categoria = categoria_data.get("Categoria", "").lower()
-        opciones = categoria_data.get("Opciones", [])
+    for categoria in menu_json:
+        nombre_categoria = categoria.get("Categoria", "").lower()
+        opciones = categoria.get("Opciones", [])
 
-        for item in opciones:
-            nombre = item.get("nombre", "Sin nombre")
-            # Se usan precios y cantidades ficticias para los productos base
-            precio = item.get("precio", 3.0) 
-            cantidad = item.get("cantidad", 40)
+        if nombre_categoria == "pan":
+            for opcion in opciones:
+                productos.append(Pan(
+                    id=id_counter,
+                    nombre=opcion["nombre"],
+                    precio=1.5,
+                    cantidad=100,
+                    tamaño=opcion.get("tamaño", 0)
+                ))
+                id_counter += 1
 
-            if categoria == "pan":
-                producto = Pan(
-                    id=id_actual,
-                    nombre=nombre,
-                    precio=precio,
-                    cantidad=cantidad,
-                    tamaño=item.get("tamaño", 6)
-                )
+        elif nombre_categoria == "salchicha":
+            for opcion in opciones:
+                productos.append(PerroProducto(
+                    id=id_counter,
+                    nombre=opcion["nombre"],
+                    precio=2.0,
+                    cantidad=100,
+                    tipo_salchicha=opcion.get("tipo", "vienesa")
+                ))
+                id_counter += 1
 
-            elif categoria == "salchicha":
-                producto = PerroProducto(
-                    id=id_actual,
-                    nombre=nombre,
-                    precio=precio,
-                    cantidad=cantidad,
-                    tipo_salchicha=item.get("tipo", "vienesa")
-                )
+        elif nombre_categoria == "acompañante":
+            for opcion in opciones:
+                productos.append(Acompañamiento(
+                    id=id_counter,
+                    nombre=opcion["nombre"],
+                    precio=1.0,
+                    cantidad=100,
+                    tipo=opcion.get("tipo", "bebida"),
+                    detalles=[f"{opcion.get('tamaño', '')} {opcion.get('unidad', '')}"]
+                ))
+                id_counter += 1
 
-            elif categoria in ["topping", "toppings"]:
-                producto = Topping(
-                    id=id_actual,
-                    nombre=nombre,
-                    precio=precio,
-                    cantidad=cantidad,
-                    # Se usa un valor por defecto si no existe en el JSON
-                    es_picante=item.get("es_picante", False) 
-                )
+        elif nombre_categoria == "salsa":
+            for opcion in opciones:
+                productos.append(Salsa(
+                    id=id_counter,
+                    nombre=opcion["nombre"],
+                    precio=0.3,
+                    cantidad=100,
+                    tipo=opcion.get("base", "cremosa")
+                ))
+                id_counter += 1
 
-            elif categoria in ["salsa", "salsas"]:
-                producto = Salsa(
-                    id=id_actual,
-                    nombre=nombre,
-                    precio=precio,
-                    cantidad=cantidad,
-                    tipo=item.get("tipo", "cremosa")
-                )
-
-            elif categoria in ["acompañante", "acompañantes"]:
-                if "no vendemos alcohol" in nombre.lower():
-                    continue  # Ignorar productos con esa frase
-
-                producto = Acompañamiento(
-                    id=id_actual,
-                    nombre=nombre,
-                    precio=precio,
-                    cantidad=cantidad,
-                    tipo=item.get("tipo", "acompañante"),
-                    # Se usa un valor por defecto si no existe en el JSON
-                    detalles=item.get("detalles", []) 
-                )
-
-            else:
-                continue  # Ignorar categorías no reconocidas
-
-            productos.append(producto)
-            id_actual += 1
+        elif nombre_categoria == "toppings":   # ojo: plural y minúscula
+            for opcion in opciones:
+                productos.append(Topping(
+                    id=id_counter,
+                    nombre=opcion["nombre"],
+                    precio=0.5,
+                    cantidad=100,
+                    es_picante=False
+                ))
+                id_counter += 1
 
     return productos
+
 
 def registrar_cliente(clientes):
     nombre = input("Ingrese el nombre del cliente: ")
@@ -321,15 +365,13 @@ def guardar_menu(menu):
         print(f"Error al guardar el menú: {e}")
 
 def cargar_menu():
-    """Carga el menú desde menu.json."""
+    """Carga el menú desde el link de GitHub."""
     try:
-        with open("menu.json", "r", encoding="utf-8") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        print("Advertencia: No se encontró menu.json. Iniciando con menú vacío.")
-        return []
-    except Exception as e:
-        print(f"Error al cargar el menú: {e}")
+        response = requests.get(URL_DATOS)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error al cargar el menú desde el link: {e}")
         return []
 
 def obtener_producto_por_nombre(nombre_producto: str, productos: List[Producto]) -> Optional[Producto]: # <--- Se usa List y Optional
@@ -357,7 +399,7 @@ def verificar_inventario_hotdog(hotdog: dict, inventario: Inventario) -> bool:
         producto = obtener_producto_por_nombre(ingrediente_nombre, inventario.productos)
         
         if not producto:
-            print(f"❌ Ingrediente '{ingrediente_nombre}' NO ENCONTRADO en el inventario de ingredientes base.")
+            print(f"Ingrediente '{ingrediente_nombre}' NO ENCONTRADO en el inventario de ingredientes base.")
             todo_disponible = False
             continue
         
@@ -371,15 +413,15 @@ def verificar_inventario_hotdog(hotdog: dict, inventario: Inventario) -> bool:
              cantidad_requerida = ingredientes.count(ingrediente_nombre)
 
         if producto.cantidad >= cantidad_requerida:
-            print(f"✅ Ingrediente '{ingrediente_nombre}': {producto.cantidad} en stock.")
+            print(f"Ingrediente '{ingrediente_nombre}': {producto.cantidad} en stock.")
         else:
-            print(f"⚠️ Ingrediente '{ingrediente_nombre}': Stock bajo ({producto.cantidad}). Se requieren {cantidad_requerida}.")
+            print(f"Ingrediente '{ingrediente_nombre}': Stock bajo ({producto.cantidad}). Se requieren {cantidad_requerida}.")
             todo_disponible = False
 
     if todo_disponible:
-        print(f"\n✅ Inventario SUFICIENTE para el hot dog {hotdog['nombre'].upper()}.")
+        print(f"\nInventario SUFICIENTE para el hot dog {hotdog['nombre'].upper()}.")
     else:
-        print(f"\n❌ Inventario INSUFICIENTE/INCOMPLETO para el hot dog {hotdog['nombre'].upper()}.")
+        print(f"\nInventario INSUFICIENTE/INCOMPLETO para el hot dog {hotdog['nombre'].upper()}.")
 
     return todo_disponible
 
@@ -431,51 +473,64 @@ def obtener_ingrediente(productos: List[Producto], categoria: type, mensaje: str
             print("ID inválido.")
 
 def agregar_hotdog(inventario: Inventario):
-    """Permite al usuario agregar un nuevo hot dog al menú."""
-    menu = cargar_menu()
+    """Permite al usuario agregar un nuevo hot dog al menú con opción de salir en cualquier paso."""
+    menu = cargar_datos_remotos()  
     productos = inventario.productos
     
-    # 1. Nombre del Hot Dog
-    nombre_hotdog = input("Ingrese el nombre del nuevo Hot Dog: ").strip().lower()
+
+    nombre_hotdog = input("Ingrese el nombre del nuevo Hot Dog (o 'salir' para cancelar): ").strip().lower()
+    if nombre_hotdog == "salir":
+        print("Proceso cancelado. Regresando al menú principal...")
+        return
     if any(item.get("nombre", "").lower() == nombre_hotdog for item in menu):
         print("Ya existe un Hot Dog con ese nombre.")
         return
     
     print("\n--- AGREGAR NUEVO HOT DOG ---")
 
-    # 2. Seleccionar Pan
+ 
     pan_nombre, pan_tamaño = obtener_ingrediente(productos, Pan, "Pan")
-    if pan_nombre is None: return 
+    if pan_nombre is None or pan_nombre.lower() == "salir":
+        print("Proceso cancelado.")
+        return 
     
-    # 3. Seleccionar Salchicha
-    # Se pasa el tamaño del pan para la validación
-    salchicha_nombre, salchicha_tamaño = obtener_ingrediente(productos, PerroProducto, "Salchicha", validacion_size=pan_tamaño)
-    if salchicha_nombre is None: return
 
-    # 4. Seleccionar Toppings (Múltiples)
+    salchicha_nombre, salchicha_tamaño = obtener_ingrediente(productos, PerroProducto, "Salchicha", validacion_size=pan_tamaño)
+    if salchicha_nombre is None or salchicha_nombre.lower() == "salir":
+        print("Proceso cancelado.")
+        return
+
     toppings_nombres = []
-    print("\n--- Seleccionar Toppings (Ingrese 'fin' para terminar) ---")
+    print("\n--- Seleccionar Toppings (Ingrese 'fin' para terminar o 'salir' para cancelar) ---")
     while True:
-        topping_nombre, _ = obtener_ingrediente(productos, Topping, f"Topping #{len(toppings_nombres) + 1} (o 'fin' para terminar)", es_opcional=True)
-        if topping_nombre is None: 
+        topping_nombre, _ = obtener_ingrediente(productos, Topping, f"Topping #{len(toppings_nombres) + 1}", es_opcional=True)
+        if topping_nombre is None:
             break
+        if topping_nombre.lower() == "salir":
+            print("Proceso cancelado.")
+            return
         toppings_nombres.append(topping_nombre)
         
-    # 5. Seleccionar Salsas (Múltiples)
     salsas_nombres = []
-    print("\n--- Seleccionar Salsas (Ingrese 'fin' para terminar) ---")
+    print("\n--- Seleccionar Salsas (Ingrese 'fin' para terminar o 'salir' para cancelar) ---")
     while True:
-        salsa_nombre, _ = obtener_ingrediente(productos, Salsa, f"Salsa #{len(salsas_nombres) + 1} (o 'fin' para terminar)", es_opcional=True)
-        if salsa_nombre is None: 
+        salsa_nombre, _ = obtener_ingrediente(productos, Salsa, f"Salsa #{len(salsas_nombres) + 1}", es_opcional=True)
+        if salsa_nombre is None:
             break
+        if salsa_nombre.lower() == "salir":
+            print("Proceso cancelado.")
+            return
         salsas_nombres.append(salsa_nombre)
 
-    # 6. Seleccionar Acompañante (Opcional)
-    acompañante_nombre, _ = obtener_ingrediente(productos, Acompañamiento, "Acompañante", es_opcional=True)
-    if acompañante_nombre is None:
-        acompañante_nombre = "Sin acompañante" # O null, dependiendo de cómo lo quiera el JSON original
 
-    # 7. Crear el nuevo hot dog
+    acompañante_nombre, _ = obtener_ingrediente(productos, Acompañamiento, "Acompañante", es_opcional=True)
+    if acompañante_nombre and acompañante_nombre.lower() == "salir":
+        print("Proceso cancelado.")
+        return
+    if acompañante_nombre is None:
+        acompañante_nombre = "Sin acompañante"
+
+
     nuevo_hotdog = {
         "nombre": nombre_hotdog,
         "Pan": pan_nombre,
@@ -485,22 +540,20 @@ def agregar_hotdog(inventario: Inventario):
         "Acompañante": acompañante_nombre if acompañante_nombre != "Sin acompañante" else None
     }
 
-    # 8. Verificación final de inventario y advertencias
+
     print("\n--- Resumen del Nuevo Hot Dog ---")
     print(json.dumps(nuevo_hotdog, indent=4, ensure_ascii=False))
 
     verificar_inventario_hotdog(nuevo_hotdog, inventario)
 
-    confirmar = input("¿Confirmar la adición del Hot Dog al menú? (S/N): ").upper()
+    confirmar = input("¿Confirmar la adición del Hot Dog al menú? (S/N o 'salir' para cancelar): ").upper()
     if confirmar == 'S':
         menu.append(nuevo_hotdog)
-        guardar_menu(menu)
-        print(f"Hot Dog '{nombre_hotdog.upper()}' agregado al menú.")
+        print(f"Hot Dog '{nombre_hotdog.upper()}' agregado al menú (solo en memoria).")
     else:
         print("Adición de Hot Dog cancelada.")
 
 def eliminar_hotdog(inventario: Inventario):
-    """Permite al usuario eliminar un hot dog del menú con validación de inventario."""
     menu = cargar_menu()
     if not menu:
         print("El menú está vacío. No hay Hot Dogs para eliminar.")
@@ -545,47 +598,38 @@ def eliminar_hotdog(inventario: Inventario):
     except ValueError:
         print("Entrada inválida. Ingrese un número.")
 
-def menu_gestion_hotdogs(inventario: Inventario):
-    """Menú principal para la gestión de hot dogs (la nueva Opción 8)."""
+def menu_gestion_hotdogs(inventario: Inventario, hotdogs_json: list):
+    """Menú principal para la gestión de hot dogs usando datos remotos."""
     while True:
         print("\n==== Gestión del Menú de Hot Dogs ====")
         print("1. Ver la lista de hot dogs")
         print("2. Verificar inventario de un hot dog específico")
-        print("3. Agregar un nuevo hot dog")
-        print("4. Eliminar un hot dog")
-        print("5. Volver al menú principal")
+        print("3. Volver al menú principal")
 
         opcion = input("Seleccione una opción: ")
 
         if opcion == "1":
-            mostrar_menu_hotdogs()
-        
+            mostrar_menu_hotdogs(hotdogs_json)
+
         elif opcion == "2":
-            menu = cargar_menu()
-            if not menu:
+            if not hotdogs_json:
                 print("El menú está vacío.")
                 continue
             
             print("\n=== Hot Dogs para Verificar ===")
-            for i, item in enumerate(menu, start=1):
+            for i, item in enumerate(hotdogs_json, start=1):
                 print(f"{i}. {item.get('nombre').upper()}")
 
             try:
                 seleccion = int(input("Ingrese el número del Hot Dog a verificar: "))
-                if 1 <= seleccion <= len(menu):
-                    verificar_inventario_hotdog(menu[seleccion - 1], inventario)
+                if 1 <= seleccion <= len(hotdogs_json):
+                    verificar_inventario_hotdog(hotdogs_json[seleccion - 1], inventario)
                 else:
                     print("Opción inválida.")
             except ValueError:
                 print("Entrada inválida. Ingrese un número.")
 
         elif opcion == "3":
-            agregar_hotdog(inventario)
-
-        elif opcion == "4":
-            eliminar_hotdog(inventario)
-
-        elif opcion == "5":
             break
         else:
             print("Opción no válida.")
