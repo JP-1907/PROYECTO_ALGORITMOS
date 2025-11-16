@@ -532,12 +532,12 @@ def obtener_ingrediente(productos: List[Producto], categoria: type, mensaje: str
 
             if seleccionado and isinstance(seleccionado, categoria):
                 if seleccionado.cantidad <= 0:
-                    print(f"⚠️ Advertencia: El ingrediente '{seleccionado.nombre}' está AGOTADO. Por favor, seleccione otro o cancele.")
+                    print(f"Advertencia: El ingrediente '{seleccionado.nombre}' está AGOTADO. Por favor, seleccione otro o cancele.")
                     continue
 
                 if validacion_size is not None and categoria in (Pan, PerroProducto):
                     if seleccionado.tamaño != validacion_size:
-                        print(f"⚠️ ADVERTENCIA DE TAMAÑO: El '{seleccionado.nombre}' tiene un tamaño de {seleccionado.tamaño}, diferente al requerido ({validacion_size}).")
+                        print(f"ADVERTENCIA DE TAMAÑO: El '{seleccionado.nombre}' tiene un tamaño de {seleccionado.tamaño}, diferente al requerido ({validacion_size}).")
                         confirmar = input("¿Desea continuar con esta selección? (S/N): ").upper()
                         if confirmar != 'S':
                             continue
