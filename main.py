@@ -21,12 +21,13 @@ print("***********************************************************************\n
 while True:
     print("\n====Menú Principal====")
     print("1. Registrar cliente")
-    print("2. Mostrar menú")
-    print("3. Realizar compra")
+    print("2. Mostrar menú de hot dogs")
+    print("3. Realizar compra de ingredientes")
     print("4. Gestión de Inventario") 
-    print("5. Salir")
+    print("5. Gestión del Menú de Hot Dogs") # Nueva Opción
     print("6. Simular un día de ventas")
     print("7. Ver estadísticas")
+    print("8. Salir") # Opción Salir movida
 
     opcion = input("Ingrese la opción deseada: ")
 
@@ -35,24 +36,17 @@ while True:
     elif opcion == "2":
         f.mostrar_menu_hotdogs()
     elif opcion == "3":
-        f.realizar_compra(clientes, productos) if productos else print("No se puede realizar la compra: menú vacío.")
+        f.realizar_compra(clientes, productos) if productos else print("No se puede realizar la compra: menú de ingredientes vacío.")
     elif opcion == "4":
         f.menu_inventario(inventario)  
-    elif opcion == "5": 
-        print("Saliendo del sistema...")
-        break
+    elif opcion == "5":
+        f.menu_gestion_hotdogs(inventario) 
     elif opcion == "6":
         f.simular_ventas(productos, inventario)
     elif opcion == "7":
         f.mostrar_estadisticas()
+    elif opcion == "8": 
+        print("Saliendo del sistema...")
+        break
     else:
         print("Opción no válida. Intente nuevamente.")
-
-
-
-
-
-
-
-
-
